@@ -19,16 +19,6 @@ const FONT = `'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif
 const SPOTS_TOTAL = 20;
 const SPOTS_TAKEN = 6;
 
-// ══════════════════════════════════════════════════════════
-// CONFIGURATION : Remplace cette URL par ton endpoint
-// Options :
-//   - Formspree : "https://formspree.io/f/TON_ID"
-//   - Web3Forms : "https://api.web3forms.com/submit"
-//   - Airtable via Make.com : ton URL de webhook Make
-//   - Ton propre backend
-// ══════════════════════════════════════════════════════════
-const FORM_ENDPOINT = "";  // ← À remplir
-
 export default function App() {
   const [form, setForm] = useState({ email: "", agences: "", secretariat: "", erp: "", probleme: "" });
   const [submitted, setSubmitted] = useState(false);
@@ -60,25 +50,23 @@ export default function App() {
     if (!canSubmit) return;
     setSending(true);
     try {
-      if (FORM_ENDPOINT) {
-        await fetch(FORM_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Accept": "application/json" },
-          body: JSON.stringify({
-            email: form.email,
-            agences: form.agences,
-            secretariat: form.secretariat,
-            erp: form.erp,
-            outil_actuel: form.probleme,
-            source: "landing-page-club-fondateur",
-            date: new Date().toISOString(),
-          }),
-        });
-      }
+      const formData = new URLSearchParams({
+        "form-name": "candidature-fondateur",
+        email: form.email,
+        agences: form.agences,
+        secretariat: form.secretariat,
+        erp: form.erp,
+        outil_actuel: form.probleme,
+      });
+      await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString(),
+      });
       setSubmitted(true);
     } catch (err) {
-      console.error("Erreur envoi formulaire:", err);
-      setSubmitted(true); // On affiche quand même la confirmation
+      console.error("Erreur:", err);
+      setSubmitted(true);
     }
     setSending(false);
   };
@@ -125,7 +113,7 @@ export default function App() {
         </div>
       </nav>
 
-      {/* ═══ HERO ═══ */}
+      {/* HERO */}
       <section style={{
         minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center",
         padding: "100px 24px 60px", maxWidth: 1100, margin: "0 auto",
@@ -200,7 +188,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ═══ LE COÛT DE L'INACTION ═══ */}
+      {/* LE COÛT */}
       <section id="cost" ref={setRef("cost")} style={{ padding: "80px 24px 40px", maxWidth: 1100, margin: "0 auto" }}>
         <div style={{
           ...anim("cost"),
@@ -218,7 +206,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ═══ ERP + CRM ═══ */}
+      {/* ERP + CRM */}
       <section id="erp" ref={setRef("erp")} style={{ padding: "80px 24px 40px", maxWidth: 1100, margin: "0 auto" }}>
         <div style={{
           ...anim("erp"),
@@ -253,7 +241,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ═══ CE QUE DRIVEPOOL CHANGE ═══ */}
+      {/* CE QUE DRIVEPOOL CHANGE */}
       <section id="what" ref={setRef("what")} style={{ padding: "40px 24px 80px", maxWidth: 1100, margin: "0 auto" }}>
         <div style={anim("what")}>
           <h2 style={{
@@ -300,7 +288,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ═══ ORIGIN STORY ═══ */}
+      {/* ORIGIN STORY */}
       <section id="story" ref={setRef("story")} style={{ padding: "60px 24px", maxWidth: 1100, margin: "0 auto" }}>
         <div style={{
           ...anim("story"),
@@ -320,7 +308,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ═══ CLUB FONDATEUR ═══ */}
+      {/* CLUB FONDATEUR */}
       <section id="fondateur" ref={setRef("fondateur")} style={{ padding: "80px 24px", maxWidth: 1100, margin: "0 auto" }}>
         <div style={anim("fondateur")}>
           <div style={{
@@ -334,7 +322,7 @@ export default function App() {
             lineHeight: 1.15, color: C.navy, maxWidth: 550, marginBottom: 16, letterSpacing: "-0.02em",
           }}>20 auto-écoles. Pas une de plus.</h2>
           <p style={{ fontSize: 16, lineHeight: 1.7, color: C.textBody, maxWidth: 500, marginBottom: 40 }}>
-            Je fais l'accompagnement moi-même. C'est pour ça que c'est limité — et c'est pour ça que ça marche.
+            J'accompagne chaque auto-école personnellement. C'est pour ça que c'est limité.
           </p>
         </div>
 
@@ -361,7 +349,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ═══ CANDIDATURE FORM ═══ */}
+      {/* CANDIDATURE FORM */}
       <section id="candidature" ref={setRef("candidature")} style={{ padding: "80px 24px 120px", maxWidth: 1100, margin: "0 auto" }}>
         <div style={{
           ...anim("candidature"),
@@ -393,7 +381,6 @@ export default function App() {
                 boxShadow: C.shadowMd, padding: "32px 28px",
               }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                  {/* Email */}
                   <div>
                     <label style={labelStyle}>Votre email *</label>
                     <input type="email" placeholder="nom@auto-ecole.fr" value={form.email}
@@ -403,7 +390,6 @@ export default function App() {
                     />
                   </div>
 
-                  {/* Agences + Secrétariat on same row */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                     <div>
                       <label style={labelStyle}>Nombre d'agences *</label>
@@ -427,7 +413,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* ERP */}
                   <div>
                     <label style={labelStyle}>Quel logiciel / ERP utilisez-vous ? *</label>
                     <select value={form.erp} onChange={upd("erp")} style={selectStyle}>
@@ -441,7 +426,6 @@ export default function App() {
                     </select>
                   </div>
 
-                  {/* Problème */}
                   <div>
                     <label style={labelStyle}>Utilisez-vous un outil pour suivre vos prospects et vos tâches au secrétariat ? Si oui, lequel ?</label>
                     <textarea placeholder="Ex : un cahier, un Excel, Monday, rien..." value={form.probleme}
@@ -453,7 +437,6 @@ export default function App() {
                     />
                   </div>
 
-                  {/* Submit */}
                   <button onClick={handleSubmit} disabled={!canSubmit} style={{
                     width: "100%", padding: "15px", borderRadius: 10, border: "none",
                     background: canSubmit ? C.navy : C.borderLight,
